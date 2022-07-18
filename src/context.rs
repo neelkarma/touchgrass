@@ -1,9 +1,4 @@
-use crate::{
-    args::Args,
-    config::Config,
-    formatter::{default::DefaultFormatter, json::JSONFormatter, Formatter},
-    provider::{owm::OWMProvider, Provider},
-};
+use crate::{args::Args, config::Config, formatter::Formatter, provider::Provider};
 use clap::{clap_derive::ArgEnum, Parser};
 
 #[derive(Debug)]

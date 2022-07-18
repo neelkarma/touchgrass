@@ -8,7 +8,6 @@ use crate::{
 mod args;
 mod config;
 mod context;
-mod error;
 mod formatter;
 mod provider;
 

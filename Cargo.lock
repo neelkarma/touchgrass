@@ -849,7 +849,7 @@ dependencies = [
 
 [[package]]
 name = "touchgrass"
-version = "0.0.1-prepreprealpha"
+version = "0.0.1-alpha"
 dependencies = [
  "clap",
  "colored",

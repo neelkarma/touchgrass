@@ -1,8 +1,6 @@
 use colored::Color;
 use serde::Serialize;
 
-use self::owm::OWMProvider;
-
 pub mod owm;
 
 #[derive(Debug, Serialize)]
