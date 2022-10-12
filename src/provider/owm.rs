@@ -1,9 +1,9 @@
 use std::collections::HashMap;
 
-use super::Weather;
+use super::{Provider, Weather};
 use crate::context::{Context, Location};
+use anyhow::Result;
 use colored::Color;
-use reqwest::blocking::Client;
 use serde::Deserialize;
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -145,28 +145,33 @@ pub struct OWMGeolocationItem {
 
 #[derive(Debug)]
 pub struct OWMProvider;
-impl OWMProvider {
-    pub fn get(ctx: &Context) -> Result<Weather, reqwest::Error> {
-        let client = Client::new();
 
+impl OWMProvider {
+    fn get_geolocation(&self, ctx: &Context, name: &str) -> Result<(String, String)> {
+        let res = ctx
+            .client
+            .get("http://api.openweathermap.org/geo/1.0/direct")
+            .query(&[
+                ("q", name),
+                ("limit", &"1".to_string()),
+                ("appid", &ctx.apikey.clone()),
+            ])
+            .send()?;
+
+        let parsed = &res.json::<OWMGeolocationResponse>()?[0];
+        Ok((parsed.lat.to_string(), parsed.lon.to_string()))
+    }
+}
+
+impl Provider for OWMProvider {
+    fn get(&self, ctx: &Context) -> Result<Weather> {
         let coords = match &ctx.location {
             Location::Coords(lat, lon) => (lat.to_string(), lon.to_string()),
-            Location::Name(name) => {
-                let res = client
-                    .get("http://api.openweathermap.org/geo/1.0/direct")
-                    .query(&[
-                        ("q", name),
-                        ("limit", &"1".to_string()),
-                        ("appid", &ctx.apikey.clone()),
-                    ])
-                    .send()?;
-
-                let parsed = &res.json::<OWMGeolocationResponse>()?[0];
-                (parsed.lon.to_string(), parsed.lat.to_string())
-            }
+            Location::Name(name) => self.get_geolocation(ctx, name)?,
         };
 
-        let res = client
+        let res = ctx
+            .client
             .get("https://api.openweathermap.org/data/2.5/weather")
             .query(&[
                 ("lat", coords.0),

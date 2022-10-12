@@ -1,34 +1,38 @@
-use crate::{args::Args, config::Config, formatter::Formatter, provider::Provider};
+use crate::{args::Args, config::Config, formatter::Formatters, provider::Providers};
+use anyhow::{bail, Result};
 use clap::{clap_derive::ArgEnum, Parser};
+use reqwest::blocking::Client;
 
 #[derive(Debug)]
 pub struct Context {
+    pub client: Client,
     pub location: Location,
     pub units: Units,
     pub apikey: String,
-    pub provider: Provider,
-    pub formatter: Formatter,
+    pub provider: Providers,
+    pub formatter: Formatters,
 }
 
 impl Context {
-    pub fn build() -> Self {
+    pub fn build() -> Result<Self> {
         let args = Args::parse();
+        let client = Client::new();
         let config = Config::read();
         let formatter = match args.json {
-            true => Formatter::JSON,
-            false => Formatter::Default,
+            true => Formatters::JSON,
+            false => Formatters::Default,
         };
-        let provider = Provider::OpenWeatherMap;
+        let provider = Providers::OpenWeatherMap;
         let location = if let Some(loc_str) = args.location {
             Location::from_str(&loc_str)
         } else if let Some(ref config) = config {
             if let Some(loc_str) = &config.location {
                 Location::from_str(&loc_str)
             } else {
-                panic!("No location specified in either config file or arguments!")
+                bail!("No location specified in either config file or arguments!")
             }
         } else {
-            panic!("No location specified in either config file or arguments!")
+            bail!("No location specified in either config file or arguments!")
         };
 
         let units = if let Some(unit) = args.units {
@@ -53,19 +57,20 @@ impl Context {
             if let Some(apikey) = config.apikey {
                 apikey
             } else {
-                panic!("No OpenWeatherMap API Key specified in either config file or arguments!")
+                bail!("No OpenWeatherMap API Key specified in either config file or arguments!")
             }
         } else {
-            panic!("No OpenWeatherMap API Key specified in either config file or arguments!")
+            bail!("No OpenWeatherMap API Key specified in either config file or arguments!")
         };
 
-        Self {
+        Ok(Self {
+            client,
             apikey,
             location,
             formatter,
             provider,
             units,
-        }
+        })
     }
 }
 

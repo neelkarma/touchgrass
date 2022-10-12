@@ -2,11 +2,13 @@ use colored::Colorize;
 
 use crate::{context::Context, provider::Weather};
 
+use super::Formatter;
+
 #[derive(Debug)]
 pub struct DefaultFormatter;
 
-impl DefaultFormatter {
-    pub fn format(ctx: &Context, weather: &Weather) -> String {
+impl Formatter for DefaultFormatter {
+    fn format(&self, ctx: &Context, weather: &Weather) -> String {
         [
             format!(
                 "{} {}",

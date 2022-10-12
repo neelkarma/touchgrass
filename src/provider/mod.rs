@@ -1,5 +1,10 @@
+use anyhow::Result;
 use colored::Color;
 use serde::Serialize;
+
+use crate::context::Context;
+
+use self::owm::OWMProvider;
 
 pub mod owm;
 
@@ -19,6 +24,18 @@ pub struct Weather {
 }
 
 #[derive(Debug)]
-pub enum Provider {
+pub enum Providers {
     OpenWeatherMap,
+}
+
+impl Providers {
+    pub fn into_provider(&self) -> &dyn Provider {
+        match self {
+            Self::OpenWeatherMap => &OWMProvider,
+        }
+    }
+}
+
+pub trait Provider {
+    fn get(&self, cx: &Context) -> Result<Weather>;
 }

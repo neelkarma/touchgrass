@@ -10,19 +10,11 @@ pub struct Config {
 
 impl Config {
     pub fn read() -> Option<Self> {
-        if let Ok(home) = env::var("HOME") {
+        env::var("HOME").ok().and_then(|home| {
             let path = Path::new(&home).join(".config/touchgrass.toml");
-            if let Ok(contents) = fs::read_to_string(path) {
-                if let Ok(parsed) = toml::from_str::<Self>(&contents) {
-                    Some(parsed)
-                } else {
-                    None
-                }
-            } else {
-                None
-            }
-        } else {
-            None
-        }
+            fs::read_to_string(path)
+                .ok()
+                .and_then(|contents| toml::from_str::<Self>(&contents).ok())
+        })
     }
 }
