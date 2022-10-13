@@ -1,5 +1,3 @@
-use std::collections::HashMap;
-
 use super::{Provider, Weather};
 use crate::context::{Context, Location};
 use anyhow::Result;
@@ -9,55 +7,22 @@ use serde::Deserialize;
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct OWMResponse {
     #[serde(default)]
-    pub coord: OWMResponseCoord,
-    #[serde(default)]
     pub weather: Vec<OWMResponseWeather>,
     #[serde(default)]
-    pub base: String,
-    #[serde(default)]
     pub main: OWMResponseMain,
-    #[serde(default)]
-    pub visibility: i64,
     #[serde(default)]
     pub wind: OWMResponseWind,
     #[serde(default)]
     pub rain: OWMResponseRain,
-    #[serde(default)]
-    pub snow: OWMResponseSnow,
-    #[serde(default)]
-    pub clouds: OWMResponseClouds,
-    #[serde(default)]
-    pub dt: i64,
-    #[serde(default)]
-    pub sys: OWMResponseSys,
-    #[serde(default)]
-    pub timezone: i64,
-    #[serde(default)]
-    pub id: i64,
-    #[serde(default)]
     pub name: String,
-    #[serde(default)]
-    pub cod: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct OWMResponseCoord {
-    #[serde(default)]
-    pub lon: f64,
-    #[serde(default)]
-    pub lat: f64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct OWMResponseWeather {
     #[serde(default)]
-    pub id: i64,
-    #[serde(default)]
-    pub main: String,
+    pub id: i32,
     #[serde(default)]
     pub description: String,
-    #[serde(default)]
-    pub icon: String,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
@@ -70,22 +35,12 @@ pub struct OWMResponseMain {
     pub temp_min: f64,
     #[serde(default)]
     pub temp_max: f64,
-    #[serde(default)]
-    pub pressure: f64,
-    #[serde(default)]
-    pub humidity: f64,
-    #[serde(default)]
-    pub sea_level: f64,
-    #[serde(default)]
-    pub grnd_level: f64,
 }
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct OWMResponseWind {
     #[serde(default)]
     pub speed: f64,
-    #[serde(default)]
-    pub deg: i64,
     #[serde(default)]
     pub gust: f64,
 }
@@ -95,52 +50,14 @@ pub struct OWMResponseRain {
     #[serde(rename = "1h")]
     #[serde(default)]
     pub n1h: f64,
-    #[serde(rename = "3h")]
-    #[serde(default)]
-    pub n3h: f64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct OWMResponseSnow {
-    #[serde(rename = "1h")]
-    #[serde(default)]
-    pub n1h: f64,
-    #[serde(rename = "3h")]
-    #[serde(default)]
-    pub n3h: f64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct OWMResponseClouds {
-    #[serde(default)]
-    pub all: i64,
-}
-
-#[derive(Default, Debug, Clone, PartialEq, Deserialize)]
-pub struct OWMResponseSys {
-    #[serde(rename = "type", default)]
-    pub internal_type: i64,
-    #[serde(default)]
-    pub id: i64,
-    #[serde(default)]
-    pub message: f64,
-    #[serde(default)]
-    pub country: String,
-    #[serde(default)]
-    pub sunrise: i64,
-    #[serde(default)]
-    pub sunset: i64,
 }
 
 pub type OWMGeolocationResponse = Vec<OWMGeolocationItem>;
 
 #[derive(Default, Debug, Clone, PartialEq, Deserialize)]
 pub struct OWMGeolocationItem {
-    pub name: String,
-    pub local_names: HashMap<String, String>,
     pub lat: f64,
     pub lon: f64,
-    pub country: String,
 }
 
 #[derive(Debug)]
